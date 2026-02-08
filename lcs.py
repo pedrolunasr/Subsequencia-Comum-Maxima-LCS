@@ -1,24 +1,43 @@
-def extrair_lcs(s1, s2):
-    lcs = []
-    i = len(s1)
-    j = len(s2)
+def lcs(a: str, b: str) -> str:
+    """
+    Retorna UMA Longest Common Subsequence (LCS) entre a e b.
+    Complexidade: O(len(a)*len(b)) em tempo e memória.
+    """
+    n, m = len(a), len(b)
 
-    matriz = [[0 for _ in range(i + 1)] for _ in range(j + 1)]
-    # Enquanto não chegarmos no topo ou na borda esquerda da matriz
+    # dp[i][j] = tamanho do LCS entre a[:i] e b[:j]
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+    # Preenche a tabela
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            if a[i - 1] == b[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+    # Reconstrói uma LCS voltando pela tabela
+    i, j = n, m
+    out = []
     while i > 0 and j > 0:
-        # Se os caracteres são iguais, eles fazem parte da subsequência!
-        if s1[i-1] == s2[j-1]:
-            lcs.append(s1[i-1])
+        if a[i - 1] == b[j - 1]:
+            out.append(a[i - 1])
             i -= 1
             j -= 1
-        # Caso contrário, vamos para a direção do maior valor vizinho
-        elif matriz[i-1][j] > matriz[i][j-1]:
-            i -= 1
         else:
-            j -= 1
+            # Preferência de caminho em empate: sobe (i-1,j).
+            # Isso influencia qual LCS você obtém quando há mais de uma.
+            if dp[i - 1][j] >= dp[i][j - 1]:
+                i -= 1
+            else:
+                j -= 1
 
-    # Como começamos do fim, precisamos inverter a lista
-    return "".join(reversed(lcs))
+    return "".join(reversed(out))
 
 
-extrair_lcs("Pedro", "Pedra")
+
+a = "banana"
+b = "benanani"
+seq = lcs(a, b)
+print("LCS:", seq)
+print("Tamanho:", len(seq))
